@@ -18,6 +18,9 @@ export enum PrefixType {
   QuizAttempt = "qat",
   Category = "cat",
   StudySession = "ses",
+  Guest = "gst",
+  RawWebhookEvent = "rwe",
+  ChatMessage = "msg",
 }
 
 export function generateSid(prefix: PrefixType = PrefixType.Base): string {
