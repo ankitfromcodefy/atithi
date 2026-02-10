@@ -6,21 +6,21 @@ import {
   CreateDateColumn,
   Index,
   UpdateDateColumn,
-} from "typeorm";
-import KSUID from "ksuid";
+} from 'typeorm';
+import KSUID from 'ksuid';
 
 export enum PrefixType {
-  Base = "bas",
-  User = "usr",
-  Question = "qst",
-  Answer = "ans",
-  Quiz = "qiz",
-  QuizAttempt = "qat",
-  Category = "cat",
-  StudySession = "ses",
-  Guest = "gst",
-  RawWebhookEvent = "rwe",
-  ChatMessage = "msg",
+  Base = 'bas',
+  User = 'usr',
+  Question = 'qst',
+  Answer = 'ans',
+  Quiz = 'qiz',
+  QuizAttempt = 'qat',
+  Category = 'cat',
+  StudySession = 'ses',
+  Guest = 'gst',
+  RawWebhookEvent = 'rwe',
+  ChatMessage = 'msg',
 }
 
 export function generateSid(prefix: PrefixType = PrefixType.Base): string {
@@ -31,15 +31,15 @@ export abstract class Base {
   objectID?: string;
   prefix?: PrefixType = PrefixType.Base;
 
-  @Column({ primary: true, unique: true, type: "varchar" })
+  @Column({ primary: true, unique: true, type: 'varchar' })
   @Index()
   hash!: string;
 
-  @CreateDateColumn({ name: "created_at" })
+  @CreateDateColumn({ name: 'created_at' })
   @Index()
   createdAt: Date = new Date();
 
-  @UpdateDateColumn({ name: "updated_at" })
+  @UpdateDateColumn({ name: 'updated_at' })
   @Index()
   updatedAt: Date = new Date();
 

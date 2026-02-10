@@ -16,7 +16,7 @@ export class GuestsService {
     name: string | null,
   ): Promise<Guest> {
     const normalizedEmail = email.toLowerCase().trim();
-    let guest = await this.repo.findOne({
+    const guest = await this.repo.findOne({
       where: { email: normalizedEmail },
     });
 

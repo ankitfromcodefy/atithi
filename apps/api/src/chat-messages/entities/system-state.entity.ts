@@ -1,9 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('system_state')
 export class SystemState {

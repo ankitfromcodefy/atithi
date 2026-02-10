@@ -18,15 +18,14 @@ export interface ParsedEmail {
 export class EmailParserService {
   private readonly logger = new Logger(EmailParserService.name);
 
-  async parse(gmailMessage: gmail_v1.Schema$Message): Promise<ParsedEmail> {
+  parse(gmailMessage: gmail_v1.Schema$Message): ParsedEmail {
     const headers = gmailMessage.payload?.headers ?? [];
     const getHeader = (name: string) =>
       headers.find((h) => h.name?.toLowerCase() === name.toLowerCase())
         ?.value ?? null;
 
     const from = getHeader('From') ?? '';
-    const { name: senderName, email: senderEmail } =
-      this.parseFromHeader(from);
+    const { name: senderName, email: senderEmail } = this.parseFromHeader(from);
     const subject = getHeader('Subject');
     const inReplyTo = getHeader('In-Reply-To');
     const messageIdHeader = getHeader('Message-ID');

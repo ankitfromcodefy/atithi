@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GmailService } from '../../gmail/services/gmail.service';
-import { EmailParserService } from './email-parser.service';
+import { EmailParserService, ParsedEmail } from './email-parser.service';
 import { NormalizerService } from './normalizer.service';
 import { GuestsService } from '../../guests/services/guests.service';
 import { SystemStateService } from '../../chat-messages/services/system-state.service';
@@ -62,8 +62,9 @@ export class EmailProcessorService {
       const history = await this.gmailService.fetchHistory(storedHistoryId);
       messageIds = history.messageIds;
       latestHistoryId = history.latestHistoryId;
-    } catch (error: any) {
-      if (error?.code === 404 || error?.status === 404) {
+    } catch (error: unknown) {
+      const err = error as { code?: number; status?: number };
+      if (err?.code === 404 || err?.status === 404) {
         this.logger.warn(
           'History ID expired. Recovering with current profile.',
         );
@@ -124,9 +125,9 @@ export class EmailProcessorService {
       return;
     }
 
-    let parsed;
+    let parsed: ParsedEmail;
     try {
-      parsed = await this.emailParser.parse(gmailMessage);
+      parsed = this.emailParser.parse(gmailMessage);
     } catch (error) {
       this.logger.error(`Failed to parse email ${messageId}`, error);
       await this.rawWebhookEventsService.create({

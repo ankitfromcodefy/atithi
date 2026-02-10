@@ -46,3 +46,4 @@ postgres_data/
 # GCP
 gcp-key.json
 *.pem
+client_secret_*.json
