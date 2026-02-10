@@ -21,6 +21,13 @@ export class EmailWebhookController {
   async handleEmailNotification(
     @Body() body: PubSubPushPayload,
   ): Promise<{ status: string }> {
+    if (!body?.message?.data) {
+      this.logger.warn(
+        'Received malformed Pub/Sub payload (missing message.data)',
+      );
+      return { status: 'ok' };
+    }
+
     this.logger.log(
       `Received Pub/Sub notification: messageId=${body.message.messageId}`,
     );
