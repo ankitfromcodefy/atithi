@@ -20,7 +20,7 @@ export default new DataSource({
   type: "postgres",
   username: process.env.DB_USERNAME ?? "postgres",
   password: process.env.DB_PASSWORD ?? "postgres",
-  database: process.env.DB_NAME ?? "loom",
+  database: process.env.DB_NAME ?? "atithi",
   synchronize: false,
   logging: false,
   extra: { max: 10 },

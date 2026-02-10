@@ -31,8 +31,8 @@ async function bootstrap() {
   app.setGlobalPrefix("v1");
 
   const config = new DocumentBuilder()
-    .setTitle("Project Loom API")
-    .setDescription("API for Project Loom")
+    .setTitle("Atithi API")
+    .setDescription("API for Atithi")
     .setVersion("1.0")
     .addBearerAuth()
     .build();

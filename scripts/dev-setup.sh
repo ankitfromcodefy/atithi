@@ -29,7 +29,7 @@ start_database() {
     docker-compose up -d postgres
 
     print_status "Waiting for database to be ready..."
-    until docker exec loom-postgres pg_isready -U postgres > /dev/null 2>&1; do
+    until docker exec atithi-postgres pg_isready -U postgres > /dev/null 2>&1; do
         sleep 1
     done
     print_success "Database is ready!"

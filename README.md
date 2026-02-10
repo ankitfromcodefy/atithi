@@ -1,6 +1,6 @@
-# Project Loom
+# Atithi
 
-A new project for Project Loom.
+A new project for Atithi.
 
 ## Next steps
 - Define the tech stack (e.g., web app, CLI tool, or service).

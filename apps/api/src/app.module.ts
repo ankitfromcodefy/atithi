@@ -17,7 +17,7 @@ import { AppService } from "./app.service";
       port: parseInt(process.env.DB_PORT || "5432", 10),
       username: process.env.DB_USERNAME || "postgres",
       password: process.env.DB_PASSWORD || "postgres",
-      database: process.env.DB_NAME || "loom",
+      database: process.env.DB_NAME || "atithi",
       autoLoadEntities: true,
       synchronize: false,
     }),

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Project Loom",
-  description: "Project Loom",
+  title: "Atithi",
+  description: "Atithi",
 };
 
 export default function RootLayout({
