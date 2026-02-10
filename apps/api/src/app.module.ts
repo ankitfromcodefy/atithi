@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { GmailModule } from "./gmail/gmail.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AppService } from "./app.service";
       autoLoadEntities: true,
       synchronize: false,
     }),
+    GmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
