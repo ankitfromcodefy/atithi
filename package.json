@@ -1,0 +1,26 @@
+{
+  "name": "project-loom",
+  "private": true,
+  "packageManager": "npm@11.1.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "./scripts/dev-setup.sh all",
+    "dev:only": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "docker:up": "docker-compose up -d postgres",
+    "docker:down": "docker-compose down",
+    "db:migrate": "cd apps/api && npm run build && npm run db:migrate && cd ../..",
+    "db:generate": "cd apps/api/src/migrations && npm run db:generate --"
+  },
+  "devDependencies": {
+    "turbo": "^2.6.1",
+    "typescript": "5.8.2",
+    "prettier": "^3.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,112 @@
+name: API Release
+
+on:
+  push:
+    branches:
+      - develop
+      - production
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/api-release.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOCKER_IMAGE: ${{ vars.GCP_DOCKER_REGISTRY }}/api:${{ github.run_number }}
+  CLOUD_SQL_INSTANCE: ${{ vars.GCP_PROJECT_ID }}:us-central1:postgres
+
+jobs:
+  build:
+    name: Build API
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build API
+        run: npm run build --workspace=api
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -f ./apps/api/Dockerfile \
+            -t ${{ env.DOCKER_IMAGE }} \
+            ./apps/api
+
+      - name: Login to Google Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Push Docker Image
+        run: docker push ${{ env.DOCKER_IMAGE }}
+
+  deploy:
+    name: Deploy API
+    needs: build
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy api \
+            --image "${{ env.DOCKER_IMAGE }}" \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --min-instances=0 \
+            --max-instances=5 \
+            --memory=512Mi \
+            --cpu=1 \
+            --timeout=300 \
+            --concurrency=80 \
+            --set-env-vars="\
+          NODE_ENV=${{ github.ref_name == 'production' && 'production' || 'development' }},\
+          IS_GOOGLE_DEPLOY=true,\
+          CLOUD_SQL_INSTANCE=${{ env.CLOUD_SQL_INSTANCE }},\
+          GCP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }},\
+          GCP_LOCATION=${{ vars.GCP_LOCATION }},\
+          GCP_STORAGE_BUCKET=${{ vars.GCP_STORAGE_BUCKET }},\
+          API_URL=${{ vars.API_URL }}" \
+            --set-secrets="\
+          CLERK_SECRET_KEY=CLERK_SECRET_KEY:latest,\
+          DB_USERNAME=DB_USERNAME:latest,\
+          DB_PASSWORD=DB_PASSWORD:latest,\
+          DB_NAME=DB_NAME:latest,\
+          STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,\
+          ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest" \
+            --set-cloudsql-instances=${{ env.CLOUD_SQL_INSTANCE }}
+
+      - name: Health Check
+        run: |
+          API_URL=$(gcloud run services describe api --region=us-central1 --format='value(status.url)')
+          echo "API URL: $API_URL"
+          sleep 10
+          curl -f "$API_URL/v1/health"
