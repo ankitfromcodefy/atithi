@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Mail, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/v1";
 
-export default function Home() {
+function Dashboard() {
   const searchParams = useSearchParams();
   const [gmailConnected, setGmailConnected] = useState(false);
 
@@ -61,5 +61,13 @@ export default function Home() {
         </Card>
       </main>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense>
+      <Dashboard />
+    </Suspense>
   );
 }
