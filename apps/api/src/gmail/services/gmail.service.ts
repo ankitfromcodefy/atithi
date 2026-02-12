@@ -10,8 +10,13 @@ export class GmailService implements OnModuleInit {
   private readonly redirectUri: string;
 
   constructor(private readonly configService: ConfigService) {
-    const port = this.configService.get<string>('PORT', '3001');
-    this.redirectUri = `http://localhost:${port}/v1/auth/google/callback`;
+    const apiUrl = this.configService.get<string>('API_URL');
+    if (apiUrl) {
+      this.redirectUri = `${apiUrl}/v1/auth/google/callback`;
+    } else {
+      const port = this.configService.get<string>('PORT', '3001');
+      this.redirectUri = `http://localhost:${port}/v1/auth/google/callback`;
+    }
   }
 
   onModuleInit() {

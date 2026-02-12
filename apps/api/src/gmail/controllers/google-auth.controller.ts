@@ -11,7 +11,7 @@ export class GoogleAuthController {
   @Get()
   startOAuth(@Res() reply: FastifyReply) {
     const url = this.gmailService.getAuthUrl();
-    return reply.redirect(url);
+    return reply.status(302).redirect(url);
   }
 
   @Get('callback')
