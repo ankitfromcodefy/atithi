@@ -1,4 +1,5 @@
 import { Controller, Get, Query, Res, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { FastifyReply } from 'fastify';
 import { GmailService } from '../services/gmail.service';
 
@@ -6,7 +7,10 @@ import { GmailService } from '../services/gmail.service';
 export class GoogleAuthController {
   private readonly logger = new Logger(GoogleAuthController.name);
 
-  constructor(private readonly gmailService: GmailService) {}
+  constructor(
+    private readonly gmailService: GmailService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get()
   startOAuth(@Res() reply: FastifyReply) {
@@ -23,12 +27,12 @@ export class GoogleAuthController {
 
     this.logger.log('=== GMAIL OAUTH COMPLETE ===');
     this.logger.log(`Refresh Token: ${refreshToken}`);
-    this.logger.log('Add this to your .env as GMAIL_REFRESH_TOKEN');
     this.logger.log('============================');
 
-    return reply.send({
-      message: 'OAuth complete. Check server logs for refresh token.',
-      refreshToken,
-    });
+    const frontendUrl = this.configService.get<string>(
+      'CORS_ORIGINS',
+      'http://localhost:3000',
+    );
+    return reply.status(302).redirect(`${frontendUrl}?gmail=connected`);
   }
 }
